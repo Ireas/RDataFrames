@@ -1,7 +1,7 @@
-import ROOT
 import os
 import sys
 import logging
+import ROOT
 
 
 # TODO: understand TTree friends
@@ -51,7 +51,7 @@ for path in file_paths:
 	truth_chain.Add(path)
 
 ## index truth chain and and assign it as a friend to the reco chain. we need both the DSID and the event number to have a fully unique identifier
-logger.info(f"{truth_tree_name} wants to be {reco_tree_name}'s friend via [{MAJOR_KEY}, {MINOR_KEY}]")
+logger.info(f"{TRUTH_TREE_NAME} wants to be {RECO_TREE_NAME}'s friend via [{MAJOR_KEY}, {MINOR_KEY}]")
 truth_chain.BuildIndex(MAJOR_KEY, MINOR_KEY)
 reco_chain.AddFriend(truth_chain)
 
