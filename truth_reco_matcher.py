@@ -20,14 +20,21 @@ MAJOR_KEY = 'mcChannelNumber'
 MINOR_KEY = 'eventNumber'
 
 
+
+# ====================  C++ Function Declaration  ======================
+ROOT.gSystem.Load("delta_r_matching.so")
+ROOT.gInterpreter.Declare('#include "delta_r_matching.h"')
+
+
+
 # ====================  Initialization  ================================
 ## prepare logging
 logging.basicConfig(format="{levelname:<8s} {message}", style='{', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-## enable implicit multi-threading
-ROOT.EnableImplicitMT()
+## prepare root
+#ROOT.EnableImplicitMT()
 ROOT.gROOT.SetBatch(True) # use batch mode (no graphical UI available)
 ROOT.gErrorIgnoreLevel = ROOT.kWarning # only show warnings or higher priority messanges
 
@@ -64,16 +71,22 @@ logger.info("building RDataFrame")
 df = ROOT.RDataFrame(reco_chain)
 
 
-## generate W-mass in GeV
+## define and fill dataframe with W-mass in GeV
+df = df.Range(10)
 df = df.Define("Tth_MC_Higgs_decay1_m_gev", "Tth_MC_Higgs_decay1_m / 1000.0")
+df = df.Define("test", "my_little_function(truth.Tth_MC_Higgs_decay1_m)")
+
+df.Display("test").Print()
 
 
-## filter by H decay
+## get number of events
 all_count = df.Count().GetValue()
 
 
 ## use minimal conditions in the filter: decay1 pdgId == +/- 24, and decay1 and decay2 pdgIds are equal and opposite
 df = df.Filter("(abs(Tth_MC_Higgs_decay1_pdgId) == 24) && ((Tth_MC_Higgs_decay1_pdgId + Tth_MC_Higgs_decay2_pdgId) == 0)")
+
+## count of filtered events
 hww_count = df.Count().GetValue()
 
 
