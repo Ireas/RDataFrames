@@ -50,3 +50,20 @@ int find_best_match(
 	int best_delta_R_index = -1;
 
 	for(int current_index=0; current_index<number_of_jets; current_index++){
+		if(unavailable_indicies->count(current_index)>0) // if unavailable, skip
+			continue;
+
+		float delta_R = calc_delta_R(truth_object_lvector.Eta(), truth_object_lvector.Phi(), jet_lvectors[current_index].Eta(), jet_lvectors[current_index].Phi() );
+		if( (delta_R<best_delta_R) && (delta_R<=DELTA_R_THRESHOLD) ){ // must be better than previous match and below threshold
+			best_delta_R = delta_R;
+			best_delta_R_index = current_index;
+		}
+	}
+
+	unavailable_indicies->insert(best_delta_R_index); // index was matched, add to unavailable indicies for next matching proccess
+	return best_delta_R_index;
+}
+
+float calc_delta_R(Float_t eta1, Float_t phi1, Float_t eta2, Float_t phi2){
+	return sqrt( (eta2-eta1)*(eta2-eta1) + (phi2-phi1)*(phi2-phi1) );
+}
